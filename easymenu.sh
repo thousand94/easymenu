@@ -23,12 +23,12 @@ do
       	"Openvpn serwer debian9")
 			sudo apt-get update -y
 			sudo apt-get upgrade -y
-			sudo apt-get install ufw
-			sudo ufw allow 22
-			sudo ufw allow 80
-			sudo ufw allow 443
-			sudo ufw enable
-			sudo ufw status
+			#sudo apt-get install ufw
+			#sudo ufw allow 22
+			#sudo ufw allow 80
+			#sudo ufw allow 443
+			#sudo ufw enable
+			#sudo ufw status
 			wget https://raw.githubusercontent.com/thousand94/easymenu/master/openvpnserverdeb9.sh
 			sudo bash openvpnserverdeb9.sh
 			cat /etc/rc.local
