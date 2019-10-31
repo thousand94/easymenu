@@ -12,7 +12,7 @@ do
 			ip a show eth0
 			cd /home
 			mkdir root
-			wget https://raw.githubusercontent.com/Angristan/openvpn-install/master/openvpn-install.sh -O centos7-vpn.sh
+			wget https://raw.githubusercontent.com/thousand94/easymenu/master/centos7vpnserver.sh
       chmod +x centos7-vpn.sh
 			sudo ./centos7-vpn.sh
 			iptables-save > /etc/firewall.conf
