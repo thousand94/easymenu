@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PS3='wpisz cyfre wybranej opcji: '
-options=("Openvpn serwer centos7" "Openvpn serwer debian9" "Openvpn klient centos7" "Openvpn klient Debian" "Routing podstawowy openvpn (na swiat)" "routing zawansowany (na swiat)" "Quit")
+options=("Openvpn serwer centos7" "Openvpn serwer debian9" "Openvpn klient centos7" "Openvpn klient Debian" "Routing podstawowy openvpn (na swiat)" "routing zawansowany (na swiat)" "LXC PROXMOX DEB9" "PROXMOX KVM" "CENTOS WEB PANEL" "CPANEL" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
@@ -151,6 +151,39 @@ do
 			iptables -A POSTROUTING -s $lokalnyip/24 -o $karta -j SNAT --to-source $publicznyip -t nat
 			iptables -A PREROUTING -i $karta -p $udptcp -m $udptcp --dport $port -j DNAT --to-destination $lokalnyip:$port -t nat
 			iptables-save > /etc/firewall.conf
+		    ;;
+		"LXC PROXMOX DEB9")
+			echo "deb http://download.proxmox.com/debian/pve stretch pve-no-subscription" > /etc/apt/sources.list.d/pve-install-repo.list
+			wget http://download.proxmox.com/debian/proxmox-ve-release-5.x.gpg -O /etc/apt/trusted.gpg.d/proxmox-ve-release-5.x.gpg
+			apt update && apt dist-upgrade -y
+			deb [arch=amd64] http://download.proxmox.com/debian/pve stretch pve-no-subscription
+			apt install proxmox-ve postfix open-iscsi -y
+			apt remove os-prober
+			apt remove linux-image-amd64 linux-image-4.9.0-3-amd64 -y
+			update-grub
+			echo "auto vmbr2
+iface vmbr2 inet static
+    address 192.168.100.1
+    netmask 255.255.255.0
+    bridge_ports none
+    bridge_stp off
+    bridge_fd 0
+    post-up echo 1 > /proc/sys/net/ipv4/ip_forward
+    post-up iptables -t nat -A POSTROUTING -s '192.168.100.0/24' -o eth0 -j MASQUERADE
+    post-down iptables -t nat -D POSTROUTING -s '192.168.100.0/24' -o eth0 -j MASQUERADE" >> /etc/network/interfaces
+	reboot
+		    ;;
+			"PROXMOX KVM")
+			sudo apt install -y qemu-kvm libvirt0 virt-manager bridge-utils
+			apt-get install qemu-guest-agent
+			echo "⚠️ obrazy systemow wrzucaj do katalogu /var/lib/vz/template/iso"
+		    ;;
+			"CENTOS WEB PANEL")
+			cd /usr/local/src
+			wget http://centos-webpanel.com/cwp-el7-latest
+			sh cwp-el7-latest
+			"CPANEL")
+			cd /home && curl -o latest -L https://securedownloads.cpanel.net/latest && sh latest
 		    ;;
         "Quit")
             break
