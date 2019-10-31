@@ -182,6 +182,7 @@ iface vmbr2 inet static
 			cd /usr/local/src
 			wget http://centos-webpanel.com/cwp-el7-latest
 			sh cwp-el7-latest
+		    ;;
 			"CPANEL")
 			cd /home && curl -o latest -L https://securedownloads.cpanel.net/latest && sh latest
 		    ;;
