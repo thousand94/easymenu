@@ -1,3 +1,3 @@
-wget https://github.com/thousand94/easymenu/blob/master/easymenu.sh
+wget https://raw.githubusercontent.com/thousand94/easymenu/master/easymenu.sh
 chmod +x easymenu.sh
 ./easymenu.sh
