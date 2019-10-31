@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PS3='Please enter your choice: '
+PS3='wpisz cyfre wybranej opcji: '
 options=("Openvpn serwer centos7" "Openvpn serwer debian9" "Openvpn klient centos7" "Openvpn klient Debian" "Routing podstawowy openvpn (na swiat)" "routing zawansowany (na swiat)" "Quit")
 select opt in "${options[@]}"
 do
@@ -13,15 +13,14 @@ do
 			cd /home
 			mkdir root
 			wget https://raw.githubusercontent.com/thousand94/easymenu/master/centos7vpnserver.sh
-      chmod +x centos7-vpn.sh
+			chmod +x centos7-vpn.sh
 			sudo ./centos7-vpn.sh
 			iptables-save > /etc/firewall.conf
 			echo "#!/bin/sh
 			iptables-restore < /etc/firewall.conf" >> /sbin/ifup-local
 			chmod +x /sbin/ifup-local
 			;;
-      "Openvpn serwer debian9")
-      echo "you chose choice 2"
+      	"Openvpn serwer debian9")
 			sudo apt-get update -y
 			sudo apt-get upgrade -y
 			sudo apt-get install ufw
@@ -30,12 +29,53 @@ do
 			sudo ufw allow 443
 			sudo ufw enable
 			sudo ufw status
-			wget https://git.io/vpn -O openvpn-install.sh
-			sudo bash openvpn-install.sh
+			wget https://raw.githubusercontent.com/thousand94/easymenu/master/openvpnserverdeb9.sh
+			sudo bash openvpnserverdeb9.sh
 			cat /etc/rc.local
+			sudo more /etc/openvpn/server.conf
+			echo "port 1194
+			proto udp
+			dev tun
+			sndbuf 0
+			rcvbuf 0
+			ca ca.crt
+			cert server.crt
+			key server.key
+			dh dh.pem
+			auth SHA512
+			tls-auth ta.key 0
+			topology subnet
+			server 10.8.0.0 255.255.255.0
+			ifconfig-pool-persist ipp.txt
+			push "redirect-gateway def1 bypass-dhcp"
+			push "dhcp-option DNS 173.230.155.5"
+			push "dhcp-option DNS 173.255.212.5"
+			push "dhcp-option DNS 173.255.219.5"
+			push "dhcp-option DNS 173.255.241.5"
+			push "dhcp-option DNS 173.255.243.5"
+			push "dhcp-option DNS 173.255.244.5"
+			push "dhcp-option DNS 173.230.145.5"
+			push "dhcp-option DNS 173.230.147.5"
+			push "dhcp-option DNS 74.207.241.5"
+			push "dhcp-option DNS 74.207.242.5"
+			keepalive 10 120
+			cipher AES-256-CBC
+			comp-lzo
+			user nobody
+			group nogroup
+			persist-key
+			persist-tun
+			status openvpn-status.log
+			verb 3
+			crl-verify crl.pem" >> /etc/openvpn/server.conf		
+			sudo systemctl start openvpn@server
+			iptables-save > /etc/firewall.conf
+			echo "#!/bin/sh
+			iptables-restore < /etc/firewall.conf" >> /etc/network/if-up.d/iptables
+			chmod +x /etc/network/if-up.d/iptables
             ;;
 		"Openvpn klient centos7")
-		echo "⚠️ Zaczekaj :-)"
+				echo "⚠️ Zaczekaj :-)"
 				echo ""
 				echo "Pamietaj najpierw wrzuc plik desktop.ovpn do katalogu /home"
 				echo "jesli plik jest juz skopiowany wcisnij Y"
@@ -46,7 +86,7 @@ do
 				if [[ "$CONTINUE" = "n" ]]; then
 					exit 1
 				fi
-		  yum install nano wget -y
+			yum install nano wget -y
 			sudo yum update -y
 			cd /home
 			sudo yum install openvpn -y
